@@ -38,31 +38,70 @@ fun Date.humanizeDiff(): String {
     val absVal = diff.absoluteValue
 
     return when {
-        absVal / SECOND in 0..1 -> return "только что"
-        absVal / SECOND in 1..45 -> return "${if (diff > 0) "несколько секунд назад" else "через несколько секунд"}"
-        absVal / SECOND in 45..75 -> return "${if (diff > 0) "минуту назад" else "через минуту"}"
-        absVal / SECOND in 75..45 * MINUTE / SECOND -> return "${if (diff < 0) "через " else ""}${getCorrectPhrase(
+        absVal / SECOND in 0..1 -> "только что"
+        absVal / SECOND in 1..45 -> "${if (diff > 0) "несколько секунд назад" else "через несколько секунд"}"
+        absVal / SECOND in 45..75 -> "${if (diff > 0) "минуту назад" else "через минуту"}"
+        absVal / SECOND in 75..45 * MINUTE / SECOND -> "${if (diff < 0) "через " else ""}${TimeUnits.MINUTE.plural(
             convertFromMs(
                 absVal,
                 TimeUnits.MINUTE
-            ), TimeUnits.MINUTE
+            )
         )}${if (diff > 0) " назад" else ""}"
-        absVal / MINUTE in 45..75 -> return "${if (diff > 0) "час назад" else "через час"}"
-        absVal / MINUTE in 75..22 * HOUR / MINUTE -> return "${if (diff < 0) "через " else ""}${getCorrectPhrase(
+        absVal / MINUTE in 45..75 -> "${if (diff > 0) "час назад" else "через час"}"
+        absVal / MINUTE in 75..22 * HOUR / MINUTE -> return "${if (diff < 0) "через " else ""}${TimeUnits.HOUR.plural(
             convertFromMs(
                 absVal,
                 TimeUnits.HOUR
-            ), TimeUnits.HOUR
+            )
         )}${if (diff > 0) " назад" else ""}"
-        absVal / HOUR in 22..26 -> return "${if (diff > 0) "день назад" else "через день"}"
-        absVal / HOUR in 26..360 * DAY / HOUR -> return "${if (diff < 0) "через " else ""}${getCorrectPhrase(
+        absVal / HOUR in 22..26 -> "${if (diff > 0) "день назад" else "через день"}"
+        absVal / HOUR in 26..360 * DAY / HOUR -> return "${if (diff < 0) "через " else ""}${TimeUnits.DAY.plural(
             convertFromMs(
                 absVal,
                 TimeUnits.DAY
-            ), TimeUnits.DAY
+            )
         )}${if (diff > 0) " назад" else ""}"
-        absVal / DAY > 360 -> return "${if (diff > 0) "более года назад" else "более чем через год"}"
+        absVal / DAY > 360 -> "${if (diff > 0) "более года назад" else "более чем через год"}"
         else -> "Ошибка"
+    }
+}
+
+fun TimeUnits.plural(number: Int): String {
+    val rem: Int = if (number > 20) number % 10 else number % 20
+
+    return when (this) {
+        TimeUnits.SECOND -> {
+            when (rem) {
+                0, in 5..20 -> "$number секунд"
+                1 -> "$number секунда"
+                in 2..4 -> "$number секунды"
+                else -> ""
+            }
+        }
+        TimeUnits.MINUTE -> {
+            when (rem) {
+                0, in 5..20 -> "$number минут"
+                1 -> "$number минута"
+                in 2..4 -> "$number минуты"
+                else -> ""
+            }
+        }
+        TimeUnits.HOUR -> {
+            when (rem) {
+                0, in 5..20 -> "$number часов"
+                1 -> return "$number час"
+                in 2..4 -> "$number часа"
+                else -> ""
+            }
+        }
+        TimeUnits.DAY -> {
+            when (rem) {
+                0, in 5..20 -> "$number дней"
+                1 -> return "$number день"
+                in 2..4 -> "$number дня"
+                else -> ""
+            }
+        }
     }
 }
 
@@ -72,44 +111,6 @@ private fun convertFromMs(number: Long, type: TimeUnits): Int {
         TimeUnits.MINUTE -> (number * 1.0 / MINUTE).roundToInt()
         TimeUnits.HOUR -> (number * 1.0 / HOUR).roundToInt()
         TimeUnits.DAY -> (number * 1.0 / DAY).roundToInt()
-    }
-}
-
-private fun getCorrectPhrase(number: Int, type: TimeUnits): String {
-    val rem: Int
-
-    if (number > 20) {
-        rem = number % 10
-    } else {
-        rem = number % 20
-    }
-
-    return when (type) {
-        TimeUnits.MINUTE -> {
-            when (rem) {
-                0, in 5..20 -> return "$number минут"
-                1 -> return "$number минута"
-                in 2..4 -> return "$number минуты"
-                else -> ""
-            }
-        }
-        TimeUnits.HOUR -> {
-            when (rem) {
-                0, in 5..20 -> return "$number часов"
-                1 -> return "$number час"
-                in 2..4 -> return "$number часа"
-                else -> ""
-            }
-        }
-        TimeUnits.DAY -> {
-            when (rem) {
-                0, in 5..20 -> return "$number дней"
-                1 -> return "$number день"
-                in 2..4 -> return "$number дня"
-                else -> ""
-            }
-        }
-        else -> ""
     }
 }
 
