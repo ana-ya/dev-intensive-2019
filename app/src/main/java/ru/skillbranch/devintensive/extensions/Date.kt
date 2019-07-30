@@ -78,7 +78,7 @@ private fun convertFromMs(number: Long, type: TimeUnits): Int {
 enum class TimeUnits {
     SECOND {
         override fun plural(number: Int): String {
-            return when (if (number > 20) number % 10 else number % 20) {
+            return when (if (number in 0..100) number % 10 else  number % 100) {
                 0, in 5..20 -> "$number секунд"
                 1 -> "$number секунда"
                 in 2..4 -> "$number секунды"
@@ -88,7 +88,7 @@ enum class TimeUnits {
     },
     MINUTE {
         override fun plural(number: Int): String {
-            return when (if (number > 20) number % 10 else number % 20) {
+            return when (if (number in 0..100) number % 10 else  number % 100) {
                 0, in 5..20 -> "$number минут"
                 1 -> "$number минута"
                 in 2..4 -> "$number минуты"
@@ -98,7 +98,7 @@ enum class TimeUnits {
     },
     HOUR {
         override fun plural(number: Int): String {
-            return when (if (number > 20) number % 10 else number % 20) {
+            return when (if (number in 0..100) number % 10 else  number % 100) {
                 0, in 5..20 -> "$number часов"
                 1 -> return "$number час"
                 in 2..4 -> "$number часа"
