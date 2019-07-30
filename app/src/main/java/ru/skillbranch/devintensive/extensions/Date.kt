@@ -66,45 +66,6 @@ fun Date.humanizeDiff(): String {
     }
 }
 
-fun TimeUnits.plural(number: Int): String {
-    val rem: Int = if (number > 20) number % 10 else number % 20
-
-    return when (this) {
-        TimeUnits.SECOND -> {
-            when (rem) {
-                0, in 5..20 -> "$number секунд"
-                1 -> "$number секунда"
-                in 2..4 -> "$number секунды"
-                else -> ""
-            }
-        }
-        TimeUnits.MINUTE -> {
-            when (rem) {
-                0, in 5..20 -> "$number минут"
-                1 -> "$number минута"
-                in 2..4 -> "$number минуты"
-                else -> ""
-            }
-        }
-        TimeUnits.HOUR -> {
-            when (rem) {
-                0, in 5..20 -> "$number часов"
-                1 -> return "$number час"
-                in 2..4 -> "$number часа"
-                else -> ""
-            }
-        }
-        TimeUnits.DAY -> {
-            when (rem) {
-                0, in 5..20 -> "$number дней"
-                1 -> return "$number день"
-                in 2..4 -> "$number дня"
-                else -> ""
-            }
-        }
-    }
-}
-
 private fun convertFromMs(number: Long, type: TimeUnits): Int {
     return when (type) {
         TimeUnits.SECOND -> (number * 1.0 / SECOND).roundToInt()
@@ -115,8 +76,46 @@ private fun convertFromMs(number: Long, type: TimeUnits): Int {
 }
 
 enum class TimeUnits {
-    SECOND,
-    MINUTE,
-    HOUR,
-    DAY
+    SECOND {
+        override fun plural(number: Int): String {
+            return when (if (number > 20) number % 10 else number % 20) {
+                0, in 5..20 -> "$number секунд"
+                1 -> "$number секунда"
+                in 2..4 -> "$number секунды"
+                else -> ""
+            }
+        }
+    },
+    MINUTE {
+        override fun plural(number: Int): String {
+            return when (if (number > 20) number % 10 else number % 20) {
+                0, in 5..20 -> "$number минут"
+                1 -> "$number минута"
+                in 2..4 -> "$number минуты"
+                else -> ""
+            }
+        }
+    },
+    HOUR {
+        override fun plural(number: Int): String {
+            return when (if (number > 20) number % 10 else number % 20) {
+                0, in 5..20 -> "$number часов"
+                1 -> return "$number час"
+                in 2..4 -> "$number часа"
+                else -> ""
+            }
+        }
+    },
+    DAY {
+        override fun plural(number: Int): String {
+            return when (if (number > 20) number % 10 else number % 20) {
+                0, in 5..20 -> "$number дней"
+                1 -> return "$number день"
+                in 2..4 -> "$number дня"
+                else -> ""
+            }
+        }
+    };
+
+    abstract fun plural(number: Int): String
 }
